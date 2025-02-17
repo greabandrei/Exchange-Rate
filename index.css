@@ -27,7 +27,7 @@ body {
 .content-box {
     background-color: white;
     height: 70%;
-    width: 650px;
+    width: 750px;
     border-radius: 20px;
     display: flex;
     flex-direction: column;
