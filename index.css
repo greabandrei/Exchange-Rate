@@ -1,0 +1,16 @@
+body {
+    background-color: #040f43;
+}
+
+.title {
+    color: white;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.description {
+    font-weight: lighter;
+}
