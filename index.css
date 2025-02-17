@@ -84,7 +84,7 @@ body {
        .insert {
         border-radius: 12px;
         border: 0.5px solid rgb(201, 201, 201);
-        height: 80%;
+        height: 70%;
         width: 82.5%;
        }
 
@@ -99,12 +99,20 @@ body {
     
     
     .foot-content {
-        width: 95%;
+        width: 100%;
         height: 33.3%;
         /*background-color:yellow;*/
         display: flex;
-        justify-content: space-between;
+        justify-content: center;
     }
+
+        .foot-currenci {
+            width: 47.5%;
+        }
+
+        .foot-text {
+            width: 47.5%;
+        }
 
         p {
             margin: 4px;
