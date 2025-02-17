@@ -16,7 +16,7 @@ body {
 }
 
 .content-wrapper {
-    height: 500px;
+    height: 450px;
     width: 100%;
     background-color: inherit;
     display: flex;
@@ -27,6 +27,102 @@ body {
 .content-box {
     background-color: white;
     height: 70%;
-    width: 75%;
+    width: 650px;
     border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
+
+    .top-content {
+        height: 33.3%;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+        .button-box {
+            width: 95%;
+            height: 40%;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            border: 1px solid rgb(207, 207, 207);
+        }
+
+        .btn-style {
+            width: 40%;
+            border-radius: 12px;
+            height: 80%;
+            background-color: rgb(71, 82, 104);
+            color: white;
+            border: none;
+            font-weight: bolder;
+        }
+        
+
+    .middle-content {
+        height: 33.3%;
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+       
+    }
+        .input-wrapper {
+            height: 100%;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+       .insert {
+        border-radius: 12px;
+        border: 0.5px solid rgb(201, 201, 201);
+        height: 80%;
+       }
+
+       label {
+        position:absolute;
+        padding-bottom: 50px;
+        padding-right: 90px;
+        pointer-events: none;
+        color: rgb(107, 104, 104);
+       }
+
+    
+    
+    .foot-content {
+        width: 95%;
+        height: 33.3%;
+        /*background-color:yellow;*/
+        display: flex;
+        justify-content: space-between;
+    }
+
+        p {
+            margin: 4px;
+            padding-left: 2px;
+        }
+
+        .from {
+            font-size: 14px;
+            font-weight: bolder;
+        }
+
+        .to {
+            font-size: 22px;
+        }
+
+        .text {
+            font-size: 10px;
+            font-weight: bolder;
+            padding: 5px;
+        }
+
