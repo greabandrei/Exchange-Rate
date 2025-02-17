@@ -112,6 +112,8 @@ body {
 
         .foot-text {
             width: 47.5%;
+            display: flex;
+            justify-content: end;
         }
 
         p {
