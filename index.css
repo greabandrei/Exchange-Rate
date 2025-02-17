@@ -14,3 +14,19 @@ body {
 .description {
     font-weight: lighter;
 }
+
+.content-wrapper {
+    height: 500px;
+    width: 100%;
+    background-color: inherit;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.content-box {
+    background-color: white;
+    height: 70%;
+    width: 75%;
+    border-radius: 20px;
+}
