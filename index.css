@@ -82,6 +82,12 @@ body {
             flex-direction: column-reverse;
         }
 
+        input::-webkit-outer-spin-button,   /*make arrows dissappear*/
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
         .select-wrapper {
             width: 33%;
             height: 70%;
@@ -95,25 +101,56 @@ body {
         border-radius: 12px;
         border: 0.5px solid rgb(201, 201, 201);
         height: 80px;
-        width: 89%;
+        width: 95%;
         font-size: 22px;
         padding: 0;
         margin: 0;
         text-align: center;
+        cursor: pointer;
        }
+
+       .switch-btn {
+        width: 0px;
+        display: flex;
+        justify-content: center;
+        z-index: 2;
+       }
+
+            .switch-icon {
+                border-radius: 100%;
+                width: 45px;
+                height: 45px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background: white;
+                border: 1px solid rgb(201, 201, 201);
+                cursor: pointer;
+            }
+
+            img {
+                height:45px;
+                width:45px;
+                pointer-events: none;
+            }
+
+            .switch-icon:hover {
+                background: rgb(243, 243, 243);
+            }
 
        
        .select-box{
         border: 1px solid rgb(201, 201, 201);
         border-radius: 12px;
         appearance: none;
-        width: 90%;
+        width: 95%;
         height: 81.82px;
         display: flex;
         justify-content: center;
         align-items: center;
         text-align: center;
         font-size: 20px;
+        cursor: pointer;
        }
 
        .input-wrapper-label {
