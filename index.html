@@ -27,12 +27,12 @@
             <div class="middle-content">
                
                 <div class="input-wrapper">
-                    <input class="insert" type="number">
+                    <input id="amount" class="insert" type="number">
                     <label class="input-wrapper-label">Amount</label>  
                 </div>
 
                 <div class="select-wrapper">      
-                    <select id="currency1" class="select-box"></select>
+                    <select id="base-currency" class="select-box"></select>
                     <label class="input-wrapper-label">From</label>  
                 </div>
 
@@ -43,7 +43,7 @@
                 </div>
                 
                 <div class="select-wrapper">
-                        <select id="currency2" class="select-box"></select> 
+                        <select id="exchange-currency" class="select-box"></select> 
                         <label class="input-wrapper-label">To</label> 
                 </div>
     
@@ -54,10 +54,10 @@
                 
                 <div class="foot-currencies">
                     <div>
-                        <p id="exchange-result" class="from">0.00 US Dollar =</p>              
+                        <p id="from" class="from"></p>              
                     </div>
                     <div>
-                        <p class="to">0.00<span class="faded-digits">000000</span> Euros</p>
+                        <p id="to" class="to">1<span class="faded-digits"></span> Euros</p>
                     </div>
                     <div>
                         <p class="ex-from">1 USD = 0.954375 EUR</p>
