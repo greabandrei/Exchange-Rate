@@ -183,11 +183,11 @@ body {
         }
 
         .foot-currencies {
-            width: 50.3%;
+            width: 50%;
         }
 
         .foot-text {
-            width: 60%;
+            width: 50%;
             display: flex;
             justify-content: end;
             padding-right: 12px;
