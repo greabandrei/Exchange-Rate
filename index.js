@@ -42,14 +42,14 @@ class CurrencyAPI {
 
 const currencyAPI = new CurrencyAPI("fca_live_5hi73jOEMH0Rl5vURCXZLxKZlUIzKlGSGwcrBp0C");
 
+
 //GLOBALS
 let currencies = {};
-let baseCurrency;
-let exchangeCurrency;
-let number;
-let result;
-let base;
-let exchange;
+let baseCurrency;               // store base currency symbol of currency in order to use it for URL
+let exchangeCurrency;           // store the exchange currency symbol in order to use it for URL
+let currencyRate;               // store the currency ratio by base currency (1 euro = /1.2 usd/)
+let result;                     // using Object.values(result) we get an array that contains the value of currency rate
+
 
 // HTML ELEMENTS
 const fetchBtnHTML = document.getElementById("fetchBtn");
@@ -61,13 +61,14 @@ const exchangeResult = document.getElementById("to");
 const amount = document.getElementById("amount");
 const switchBtn = document.getElementById("switch-btn")
 const rateForOne = document.getElementById("ex-from")
+const lastUpdate = document.getElementById("text")
 
 // EVENT LISTENERS
 // document.addEventListener("DOMContentLoaded", async function() {
-//     currencies = await currencyAPI.getCurrencies();
-//     console.log("data: ", currencies)
-
-//     const currencySelectOptions = Object.keys(currencies).map(
+    //     currencies = await currencyAPI.getCurrencies();
+    //     console.log("data: ", currencies)
+    
+    //     const currencySelectOptions = Object.keys(currencies).map(
 //         c => `<option>${c}</option>`
 //     );
 
@@ -77,6 +78,7 @@ const rateForOne = document.getElementById("ex-from")
 //     currencySelectHTML_2.innerHTML = currencySelectOptions.join('');
 // });
 
+lastRateUpdate()
 
 allCurrencies.addEventListener("click", async function() {
     currencies = await currencyAPI.getCurrencies();
@@ -93,6 +95,15 @@ allCurrencies.addEventListener("click", async function() {
     exchangeCurrencySelectHTML.innerHTML = currencySelectOptions.join('');    
 })
 
+baseCurrencySelectHTML.addEventListener("change", function(event) {
+    console.log('Base currency changed', event.target.value)
+    baseCurrency = event.target.value
+})
+
+exchangeCurrencySelectHTML.addEventListener("change", function(event) {
+    console.log('Exchange currency change', event.target.value )
+    exchangeCurrency = event.target.value
+})
 
 fetchBtnHTML.addEventListener("click", async function() {
 
@@ -100,39 +111,27 @@ fetchBtnHTML.addEventListener("click", async function() {
     console.log('data:', exchange)
     result = exchange
 
-    exchangeResult.innerText = `${exchangeCurrencyRate()} ${exchangeCurrency}`;
     exchangeFrom.innerText = `${Number(amount.value)} ${baseCurrency} =`;
+    exchangeResult.innerText = `${exchangeCurrencyRate()} ${exchangeCurrency}`;
     rateForOne.innerText =`1 ${baseCurrency} = ${exchangeCurrencyRateOne()} ${exchangeCurrency}`
 })
 
-baseCurrencySelectHTML.addEventListener("change", function(event) {
-    console.log('Base currency changed', event.target.value)
-    base = event.target.value
-    baseCurrency = base
-})
-
-exchangeCurrencySelectHTML.addEventListener("change", function(event) {
-    console.log('Exchange currency change', event.target.value )
-    exchange = event.target.value
-    exchangeCurrency = exchange
-})
 
 switchBtn.addEventListener("click", function(){
-    let value1 = baseCurrencySelectHTML.value
-    let value2 = exchangeCurrencySelectHTML.value
- 
-    baseCurrencySelectHTML.value = value2;
-    exchangeCurrencySelectHTML.value = value1;
+    switchCurrency()
 })
+
+
+//  ========Helper Functions===========   //
 
 function exchangeCurrencyRate() {
     let rate;
     let theAmount = Number(amount.value)
     
     rate = Object.values(result)
-    number = rate[0]
+    currencyRate = rate[0]
 
-    return number * theAmount
+    return currencyRate * theAmount
 }
 
 function exchangeCurrencyRateOne() {
@@ -144,6 +143,31 @@ function exchangeCurrencyRateOne() {
     return number 
 }
 
+function lastRateUpdate(){
+    const date = new Date();
+    let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
+    let day = date.getDate() - 1;
+    let month = months[date.getMonth()];
+    let year = date.getFullYear();
 
+    let fullDate = `Last exchange rate update ${month} ${day} ${year}`
+
+    return lastUpdate.innerHTML = fullDate;
+}
+
+function switchCurrency() {
+    let selected1 = document.getElementById("base-currency");
+    let selected2 = document.getElementById("exchange-currency");
+
+    let baseIdx = selected1.selectedIndex;
+    let exchangeIdx = selected2.selectedIndex;
+
+    selected1.selectedIndex = exchangeIdx;
+    selected2.selectedIndex = baseIdx;
+
+    baseCurrency = baseCurrencySelectHTML.value;
+    exchangeCurrency = exchangeCurrencySelectHTML.value;
+
+}
 
