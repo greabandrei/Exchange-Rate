@@ -46,6 +46,8 @@ const currencyAPI = new CurrencyAPI("fca_live_5hi73jOEMH0Rl5vURCXZLxKZlUIzKlGSGw
 let currencies = {};
 let baseCurrency;
 let exchangeCurrency;
+let number;
+let result;
 
 // HTML ELEMENTS
 const fetchBtnHTML = document.getElementById("fetchBtn");
@@ -55,6 +57,7 @@ const exchangeCurrencySelectHTML = document.getElementById("exchange-currency");
 const exchangeFrom = document.getElementById("from");
 const exchangeResult = document.getElementById("to");
 const amount = document.getElementById("amount");
+const switchBtn = document.getElementById("switch-btn")
 
 // EVENT LISTENERS
 // document.addEventListener("DOMContentLoaded", async function() {
@@ -87,24 +90,10 @@ allCurrencies.addEventListener("click", async function() {
     exchangeCurrencySelectHTML.innerHTML = currencySelectOptions.join('');    
 })
 
-let result;
 
 fetchBtnHTML.addEventListener("click", async function() {
-    // const selected1 = document.getElementById("currency1")
-    // const index1 = selected1.selectedIndex
-    // console.log(index1)
 
-    // let baseCurrency = selected1[index1]
-    // console.log(baseCurrency)
-
-    // const selected2 = document.getElementById("currency2")
-    // const index2 = selected2.selectedIndex
-    // console.log(index2)
-
-    // let curencies = selected2[index2]
-    // console.log(curencies) 
-
-   const exchange = await currencyAPI.getExchangeRate(baseCurrency, exchangeCurrency);
+    const exchange = await currencyAPI.getExchangeRate(baseCurrency, exchangeCurrency);
     console.log('data:', exchange)
     result = exchange
 
@@ -123,7 +112,15 @@ exchangeCurrencySelectHTML.addEventListener("change", function(event) {
     exchangeCurrency = event.target.value
 })
 
-let number;
+switchBtn.addEventListener("click", function(){
+    let value1 = baseCurrencySelectHTML.value
+    let value2 = exchangeCurrencySelectHTML.value
+
+    baseCurrencySelectHTML.value = value2;
+    exchangeCurrencySelectHTML.value = value1;
+
+
+})
 
 function exchangeCurrencyRate() {
     let rate;
@@ -133,7 +130,6 @@ function exchangeCurrencyRate() {
     number = rate[0]
 
     return number * theAmount
-
 }
 
 
