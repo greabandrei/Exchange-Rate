@@ -147,7 +147,6 @@ async function convert(){
 switchBtn.addEventListener("click", function(){
     switchCurrency()
     convert()
-    
 })
 
 
