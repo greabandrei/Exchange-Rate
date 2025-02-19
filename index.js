@@ -80,20 +80,36 @@ const lastUpdate = document.getElementById("text")
 
 lastRateUpdate()
 
-allCurrencies.addEventListener("click", async function() {
-    currencies = await currencyAPI.getCurrencies();
-    console.log("data: ", currencies)
+// allCurrencies.addEventListener("click", async function() {
+//     currencies = await currencyAPI.getCurrencies();
+//     console.log("data: ", currencies)
     
+//     const currencySelectOptions = Object.keys(currencies).map(
+//         c => `<option>${c}</option>`
+//     );
+//     currencySelectOptions.unshift(`<option></option>`)
+    
+//     console.log(currencySelectOptions);
+    
+//     baseCurrencySelectHTML.innerHTML = currencySelectOptions.join('');
+//     exchangeCurrencySelectHTML.innerHTML = currencySelectOptions.join('');    
+// })
+
+async function getAllCurrencies() {                      //here we have the live load of currencies list 
+    
+    currencies = await currencyAPI.getCurrencies();
+
     const currencySelectOptions = Object.keys(currencies).map(
         c => `<option>${c}</option>`
     );
     currencySelectOptions.unshift(`<option></option>`)
     
-    console.log(currencySelectOptions);
-    
     baseCurrencySelectHTML.innerHTML = currencySelectOptions.join('');
     exchangeCurrencySelectHTML.innerHTML = currencySelectOptions.join('');    
-})
+}
+getAllCurrencies()
+
+
 
 baseCurrencySelectHTML.addEventListener("change", function(event) {
     console.log('Base currency changed', event.target.value)
@@ -114,12 +130,26 @@ fetchBtnHTML.addEventListener("click", async function() {
     exchangeFrom.innerText = `${Number(amount.value)} ${baseCurrency} =`;
     exchangeResult.innerText = `${exchangeCurrencyRate()} ${exchangeCurrency}`;
     rateForOne.innerText =`1 ${baseCurrency} = ${exchangeCurrencyRateOne()} ${exchangeCurrency}`
+    
 })
+
+async function convert(){
+    const exchange = await currencyAPI.getExchangeRate(baseCurrency, exchangeCurrency);
+    console.log('data:', exchange)
+    result = exchange
+
+    exchangeFrom.innerText = `${Number(amount.value)} ${baseCurrency} =`;
+    exchangeResult.innerText = `${exchangeCurrencyRate()} ${exchangeCurrency}`;
+    rateForOne.innerText =`1 ${baseCurrency} = ${exchangeCurrencyRateOne()} ${exchangeCurrency}`
+}
 
 
 switchBtn.addEventListener("click", function(){
     switchCurrency()
+    convert()
+    
 })
+
 
 
 //  ========Helper Functions===========   //
