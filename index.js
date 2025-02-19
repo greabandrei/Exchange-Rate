@@ -48,6 +48,8 @@ let baseCurrency;
 let exchangeCurrency;
 let number;
 let result;
+let base;
+let exchange;
 
 // HTML ELEMENTS
 const fetchBtnHTML = document.getElementById("fetchBtn");
@@ -58,6 +60,7 @@ const exchangeFrom = document.getElementById("from");
 const exchangeResult = document.getElementById("to");
 const amount = document.getElementById("amount");
 const switchBtn = document.getElementById("switch-btn")
+const rateForOne = document.getElementById("ex-from")
 
 // EVENT LISTENERS
 // document.addEventListener("DOMContentLoaded", async function() {
@@ -97,29 +100,29 @@ fetchBtnHTML.addEventListener("click", async function() {
     console.log('data:', exchange)
     result = exchange
 
-    exchangeResult.innerText = `${exchangeCurrencyRate()} ${exchangeCurrency}`
-    exchangeFrom.innerText = `${Number(amount.value)} ${baseCurrency} =`
+    exchangeResult.innerText = `${exchangeCurrencyRate()} ${exchangeCurrency}`;
+    exchangeFrom.innerText = `${Number(amount.value)} ${baseCurrency} =`;
+    rateForOne.innerText =`1 ${baseCurrency} = ${exchangeCurrencyRateOne()} ${exchangeCurrency}`
 })
 
 baseCurrencySelectHTML.addEventListener("change", function(event) {
     console.log('Base currency changed', event.target.value)
-    baseCurrency = event.target.value
-    console.log(baseCurrency)
+    base = event.target.value
+    baseCurrency = base
 })
 
 exchangeCurrencySelectHTML.addEventListener("change", function(event) {
     console.log('Exchange currency change', event.target.value )
-    exchangeCurrency = event.target.value
+    exchange = event.target.value
+    exchangeCurrency = exchange
 })
 
 switchBtn.addEventListener("click", function(){
     let value1 = baseCurrencySelectHTML.value
     let value2 = exchangeCurrencySelectHTML.value
-
+ 
     baseCurrencySelectHTML.value = value2;
     exchangeCurrencySelectHTML.value = value1;
-
-
 })
 
 function exchangeCurrencyRate() {
@@ -130,6 +133,15 @@ function exchangeCurrencyRate() {
     number = rate[0]
 
     return number * theAmount
+}
+
+function exchangeCurrencyRateOne() {
+    let rate;
+
+    rate = Object.values(result)
+    number = rate[0]
+
+    return number 
 }
 
 
