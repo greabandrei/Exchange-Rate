@@ -63,13 +63,12 @@ body {
         }
 
         .btn-style {
-            width: 40%;
             border-radius: 12px;
-            height: 80%;
             background-color: rgb(71, 82, 104);
             color: white;
             border: none;
             font-weight: bolder;
+            padding: 15px 60px;
         }
         
 
@@ -197,6 +196,10 @@ body {
             display: flex;
             justify-content: end;
             padding-right: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content:flex-end;
+            align-items: flex-end;
         }
 
         .from {
@@ -292,4 +295,8 @@ body {
     .date-label {
         color: rgb(128, 128, 128);
         font-size: 16px;
+    }
+
+    .hidden {
+        display: none;
     }

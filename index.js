@@ -40,7 +40,7 @@ class CurrencyAPI {
     }
 
     async getExchangeHistory(date, base, exchange) {
-        const URL = this.baseURL + "historical?" + this.#getApiParam() + "date=" + date + "&base_currency=" + base + "&currencies=" + exchange
+        const URL = this.baseURL + "historical?" + this.#getApiParam() + "&date=" + date + "&base_currency=" + base + "&currencies=" + exchange
         const result = await fetch(URL);
 
         if(!result.ok) {
@@ -77,6 +77,25 @@ const switchBtn = document.getElementById("switch-btn")
 const rateForOne = document.getElementById("ex-from")
 const lastUpdate = document.getElementById("text")
 const exchangeRateCanvas = document.getElementById("exchange-rate-history")
+const showHistoryBtn = document.getElementById("show-history-btn")
+const historyContentHTML = document.getElementById("history-content")
+const startDate = document.getElementById("start-date-input")
+const endDate = document.getElementById("end-date-input")
+
+// const DOM = {
+//     fetchBtn: document.getElementById("fetchBtn"),
+//     allCurrencies: document.getElementById("all"),
+//     baseCurrencySelect: document.getElementById("base-currency"),
+//     exchangeCurrencySelect: document.getElementById("exchange-currency"),
+//     exchangeFrom: document.getElementById("from"),
+//     exchangeResult: document.getElementById("to"),
+//     amount: document.getElementById("amount"),
+//     switchBtn: document.getElementById("switch-btn"),
+//     rateForOne: document.getElementById("ex-from"),
+//     lastUpdate: document.getElementById("text"),
+//     exchangeRateCanvas: document.getElementById("exchange-rate-history"),
+//     showHistoryBtn: document.getElementById("show-history-btn")
+// }
 
 // EVENT LISTENERS
 
@@ -120,8 +139,6 @@ document.addEventListener("DOMContentLoaded", function(){
     getAllCurrencies()
     lastRateUpdate()
 
-    
-    showChartFunc()
     // localStorage.setItem('chart', showChartFunc)
     // localStorage.setItem('test', new Date())
 })
@@ -161,6 +178,11 @@ exchangeCurrencySelectHTML.addEventListener("change", function(event) {
     exchangeCurrency = event.target.value
 })
 
+showHistoryBtn.addEventListener("click", function(){
+    historyContentHTML.classList.remove("hidden")
+    showChartFunc()
+   
+})
 
 
 
@@ -175,22 +197,25 @@ async function convert(){
 }
 
 fetchBtnHTML.addEventListener("click", function(){
-    let count=0
+
     if(Number(amount.value) <= 0){
         alert('Amount should be greater than 0')
-        count++
+        return
     }
     if(baseCurrencySelectHTML.selectedIndex === 0){
         alert('Select from wich currency to convert')
-        count++
+        return
     }
     if(exchangeCurrencySelectHTML.selectedIndex === 0){
         alert('alert to wich currency you want to exchange')
-        count++
+        return
     }
-    if(count === 0){
-        convert()
-    }
+    
+    convert()
+    
+
+    historyContentHTML.classList.add("hidden")
+    showHistoryBtn.classList.remove("hidden")
 })
 
 switchBtn.addEventListener("click", function(){
@@ -248,11 +273,22 @@ function switchCurrency() {
     exchangeCurrency = exchangeCurrencySelectHTML.value;
     
 }
+let history;
+
+async function getCurrencyHistory(date){
+    const result = await currencyAPI.getExchangeHistory(date, baseCurrency, exchangeCurrency)
+    history = result
+    const total = history[date][exchangeCurrency]
+    
+    console.log(total)
+}
+
+
 
 function showChartFunc() {
     //history chart
-    const labels = ["2025-01-01", "2025-01-02", "2025-01-03", "2025-01-04", "2025-01-05"];
-    const dataValues = [4.97, 5.12, 4.85, 5.30, 5.05];
+    const labels = ['02.12.2025','02.13.2025','02.14.2025','02.15.2025','02.16.2025','02.17.2025','02.18.2025',];
+    const dataValues = [getCurrencyHistory('2025-02-18')];
 
      new Chart(exchangeRateCanvas, {
         type: 'line',
