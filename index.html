@@ -72,11 +72,33 @@
                     <button class="btn-style" id="fetchBtn">Convert</button>
                 </div>    
             </div>
-            
+
         </div>
+
+        <div class="content-box">
+            <button id="show-chart">show chart</button>
+            
+            <div class="chart-btn">
+                <button>1d</button>
+                <button>1w</button>
+                <button>1m</button>
+                <button>1y</button>
+                <button>2y</button>
+                <button>5y</button>
+                <button>10y</button>
+            
+            </div>
+            
+            <div class="chart-content">
+                <canvas id="exchange-rate-history"></canvas>
+            </div>
+
+            <div class="slide-data">
+                <input type="range">
+            </div>
+        </div>
+
     </div>
-    <button id="show-chart">show chart</button>
-    <canvas id="exchange-rate-history"></canvas>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" integrity="sha512-CQBWl4fJHWbryGE+Pc7UAxWMUMNMWzWxF4SQo9CgkJIN1kx6djDQZjh3Y8SZ1d+6I+1zze6Z7kHXO7q3UyZAWw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="./index.js"></script>
