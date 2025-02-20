@@ -277,10 +277,8 @@ let history;
 
 async function getCurrencyHistory(date){
     const result = await currencyAPI.getExchangeHistory(date, baseCurrency, exchangeCurrency)
-    history = result
-    const total = history[date][exchangeCurrency]
-    
-    console.log(total)
+    console.log(result)
+
 }
 
 
