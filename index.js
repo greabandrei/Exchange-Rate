@@ -77,7 +77,6 @@ const switchBtn = document.getElementById("switch-btn")
 const rateForOne = document.getElementById("ex-from")
 const lastUpdate = document.getElementById("text")
 const exchangeRateCanvas = document.getElementById("exchange-rate-history")
-const showChart = document.getElementById("show-chart")
 
 // EVENT LISTENERS
 
@@ -120,33 +119,36 @@ async function getAllCurrencies() {                      //here we have the live
 document.addEventListener("DOMContentLoaded", function(){
     getAllCurrencies()
     lastRateUpdate()
- 
+
+    
+    showChartFunc()
+    // localStorage.setItem('chart', showChartFunc)
     // localStorage.setItem('test', new Date())
 })
 
-showChart.addEventListener("click", function(){
-    //history chart
-    const labels = ["2025-01-01", "2025-01-02", "2025-01-03", "2025-01-04", "2025-01-05"];
-    const dataValues = [4.97, 5.12, 4.85, 5.30, 5.05];
+// showChart.addEventListener("click", function(){
+//     //history chart
+//     const labels = ["2025-01-01", "2025-01-02", "2025-01-03", "2025-01-04", "2025-01-05"];
+//     const dataValues = [4.97, 5.12, 4.85, 5.30, 5.05];
 
-    new Chart(exchangeRateCanvas, {
-        type: 'line',
-        data: {
-            labels: labels,  // X-axis labels (dates)
-            datasets: [{
-                label: 'Value',
-                data: dataValues,  // Y-axis values
-                borderColor: 'blue',
-                backgroundColor: 'rgba(0, 0, 255, 0.1)',
-                borderWidth: 2,
-                pointRadius: 5,
-                pointBackgroundColor: 'blue',
-                pointBorderColor: 'white',
-                tension: 0.3 // Smooth curve
-            }]
-        },      
-    });
-})
+//     new Chart(exchangeRateCanvas, {
+//             type: 'line',
+//             data: {
+//                     labels: labels,  // X-axis labels (dates)
+//                     datasets: [{
+//                             label: 'Value',
+//                 data: dataValues,  // Y-axis values
+//                 borderColor: 'blue',
+//                 backgroundColor: 'rgba(0, 0, 255, 0.1)',
+//                 borderWidth: 2,
+//                 pointRadius: 5,
+//                 pointBackgroundColor: 'blue',
+//                 pointBorderColor: 'white',
+//                 tension: 0.3 // Smooth curve
+//             }]
+//         },      
+//     });
+// })
 
 
 baseCurrencySelectHTML.addEventListener("change", function(event) {
@@ -206,44 +208,68 @@ function calculateExchangeCurrencyRate() {
     
     rate = Object.values(result)
     currencyRate = rate[0]
-
+    
     return currencyRate * theAmount
 }
 
 function exchangeCurrencyRateOne() {
     let rate;
-
+    
     rate = Object.values(result)
     number = rate[0]
-
+    
     return number 
 }
 
 function lastRateUpdate(){
     const date = new Date();
     let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-
+    
     let day = date.getDate() - 1;
     let month = months[date.getMonth()];
     let year = date.getFullYear();
-
+    
     let fullDate = `Last exchange rate update ${month} ${day} ${year}`
-
+    
     return lastUpdate.innerHTML = fullDate;
 }
 
 function switchCurrency() {
     let selected1 = document.getElementById("base-currency");
     let selected2 = document.getElementById("exchange-currency");
-
+    
     let baseIdx = selected1.selectedIndex;
     let exchangeIdx = selected2.selectedIndex;
-
+    
     selected1.selectedIndex = exchangeIdx;
     selected2.selectedIndex = baseIdx;
 
     baseCurrency = baseCurrencySelectHTML.value;
     exchangeCurrency = exchangeCurrencySelectHTML.value;
+    
+}
 
+function showChartFunc() {
+    //history chart
+    const labels = ["2025-01-01", "2025-01-02", "2025-01-03", "2025-01-04", "2025-01-05"];
+    const dataValues = [4.97, 5.12, 4.85, 5.30, 5.05];
+
+     new Chart(exchangeRateCanvas, {
+        type: 'line',
+        data: {
+            labels: labels,  // X-axis labels (dates)
+            datasets: [{
+                label: 'Value',
+                data: dataValues,  // Y-axis values
+                borderColor: 'blue',
+                backgroundColor: 'rgba(0, 0, 255, 0.1)',
+                borderWidth: 2,
+                pointRadius: 5,
+                pointBackgroundColor: 'blue',
+                pointBorderColor: 'white',
+                tension: 0.3 // Smooth curve
+            }]
+        },      
+    });
 }
 

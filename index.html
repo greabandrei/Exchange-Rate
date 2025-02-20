@@ -80,9 +80,7 @@
     </div>
 
     <div class="content-wrapper">
-        <div class="content-box">
-            <button id="show-chart">show chart</button>
-            
+        <div class="content-box"> 
             <div class="chart-btn">
 
                 <button>1w</button>
@@ -91,12 +89,22 @@
             
             </div>
             
-            <div class="chart-content">
+            <div class="chart-content" >
                 <canvas id="exchange-rate-history"></canvas>
             </div>
 
-            <div class="slide-data">
-                <input type="range">
+            <div class="range-data">
+                
+                <div class="input-label">
+                    <label>Start date</label>
+                    <input type="date">
+                </div>
+                
+                <div class="input-label">
+                    <label>End date</label>
+                    <input type="date">
+                </div>
+
             </div>
         </div>
 
