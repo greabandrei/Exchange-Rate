@@ -17,25 +17,19 @@
         
         <div class="content-box">
             
-            <div class="top-content">
-    
-                <div class="button-box">
-                    <button class="btn-style" id="fetchBtn">Convert</button>
-                </div>    
-            </div>
             
             <div class="middle-content">
-               
+                
                 <div class="input-wrapper">
                     <input id="amount" class="insert" type="number">
                     <label class="input-wrapper-label">Amount</label>  
                 </div>
-
+                
                 <div class="select-wrapper">      
                     <select id="base-currency" class="select-box"></select>
                     <label class="input-wrapper-label">From</label>  
                 </div>
-
+                
                 <div class="switch-btn">
                     <button id="switch-btn" class="switch-icon" type="submit" >
                         <img src="./assets/left-and-right-arrows.png"/>
@@ -43,13 +37,13 @@
                 </div>
                 
                 <div class="select-wrapper">
-                        <select id="exchange-currency" class="select-box"></select> 
-                        <label class="input-wrapper-label">To</label> 
+                    <select id="exchange-currency" class="select-box"></select> 
+                    <label class="input-wrapper-label">To</label> 
                 </div>
-    
+                
             </div>
-
-
+            
+            
             <div class="foot-content">
                 
                 <div class="foot-currencies">
@@ -69,11 +63,22 @@
                         <h3 id="text"></h3>
                     </div>
                 </div>
-
+                
             </div>
+            
+            <div class="top-content">
+        
+                <div class="button-box">
+                    <button class="btn-style" id="fetchBtn">Convert</button>
+                </div>    
+            </div>
+            
         </div>
     </div>
-
+    <button id="show-chart">show chart</button>
+    <canvas id="exchange-rate-history"></canvas>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" integrity="sha512-CQBWl4fJHWbryGE+Pc7UAxWMUMNMWzWxF4SQo9CgkJIN1kx6djDQZjh3Y8SZ1d+6I+1zze6Z7kHXO7q3UyZAWw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="./index.js"></script>
 </body>
 </html>
