@@ -38,6 +38,20 @@ class CurrencyAPI {
         console.log(result,json);
         return json.data
     }
+
+    async getExchangeHistory(date, base, exchange) {
+        const URL = this.baseURL + "historical?" + this.#getApiParam() + "date=" + date + "&base_currency=" + base + "&currencies=" + exchange
+        const result = await fetch(URL);
+
+        if(!result.ok) {
+            throw new Error("Fetch getExchangeHistory failed!");
+        }
+
+        const json = await result.json();
+        console.log(result, json)
+
+        return json.data
+    }
 }
 
 const currencyAPI = new CurrencyAPI("fca_live_5hi73jOEMH0Rl5vURCXZLxKZlUIzKlGSGwcrBp0C");
@@ -66,20 +80,6 @@ const exchangeRateCanvas = document.getElementById("exchange-rate-history")
 const showChart = document.getElementById("show-chart")
 
 // EVENT LISTENERS
-// document.addEventListener("DOMContentLoaded", async function() {
-    //     currencies = await currencyAPI.getCurrencies();
-    //     console.log("data: ", currencies)
-    
-    //     const currencySelectOptions = Object.keys(currencies).map(
-//         c => `<option>${c}</option>`
-//     );
-
-//     console.log(currencySelectOptions);
-
-//     currencySelectHTML_1.innerHTML = currencySelectOptions.join('');
-//     currencySelectHTML_2.innerHTML = currencySelectOptions.join('');
-// });
-
 
 // allCurrencies.addEventListener("click", async function() {
 //     currencies = await currencyAPI.getCurrencies();
@@ -115,7 +115,8 @@ async function getAllCurrencies() {                      //here we have the live
     exchangeCurrencySelectHTML.innerHTML = currencySelectOptions.join('');    
 }
 
-///
+
+
 document.addEventListener("DOMContentLoaded", function(){
     getAllCurrencies()
     lastRateUpdate()
@@ -157,6 +158,8 @@ exchangeCurrencySelectHTML.addEventListener("change", function(event) {
     console.log('Exchange currency change', event.target.value )
     exchangeCurrency = event.target.value
 })
+
+
 
 
 async function convert(){
