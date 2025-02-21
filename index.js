@@ -81,6 +81,9 @@ const showHistoryBtn = document.getElementById("show-history-btn")
 const historyContentHTML = document.getElementById("history-content")
 const startDate = document.getElementById("start-date-input")
 const endDate = document.getElementById("end-date-input")
+const chartTitle = document.getElementById("chart-title")
+const subTitle = document.getElementById("sub-title")
+const chartContent = document.getElementById("chart-content")
 
 // const DOM = {
 //     fetchBtn: document.getElementById("fetchBtn"),
@@ -114,6 +117,7 @@ const endDate = document.getElementById("end-date-input")
 //     exchangeCurrencySelectHTML.innerHTML = currencySelectOptions.join('');    
 // })
 
+let allCurrenciesData;
 async function getAllCurrencies() {                      //here we have the live load of currencies list 
     currencies = localStorage.getItem('currencies')
    
@@ -124,6 +128,8 @@ async function getAllCurrencies() {                      //here we have the live
         currencies = JSON.parse(currencies)
     }
     
+    allCurrenciesData = currencies
+
     const currencySelectOptions = Object.keys(currencies).map(
         c => `<option>${c}</option>`
     );
@@ -139,49 +145,39 @@ document.addEventListener("DOMContentLoaded", function(){
     getAllCurrencies()
     lastRateUpdate()
 
-    // localStorage.setItem('chart', showChartFunc)
+    subTitle.innerHTML = `Convert currencies`
+
     // localStorage.setItem('test', new Date())
 })
 
-// showChart.addEventListener("click", function(){
-//     //history chart
-//     const labels = ["2025-01-01", "2025-01-02", "2025-01-03", "2025-01-04", "2025-01-05"];
-//     const dataValues = [4.97, 5.12, 4.85, 5.30, 5.05];
-
-//     new Chart(exchangeRateCanvas, {
-//             type: 'line',
-//             data: {
-//                     labels: labels,  // X-axis labels (dates)
-//                     datasets: [{
-//                             label: 'Value',
-//                 data: dataValues,  // Y-axis values
-//                 borderColor: 'blue',
-//                 backgroundColor: 'rgba(0, 0, 255, 0.1)',
-//                 borderWidth: 2,
-//                 pointRadius: 5,
-//                 pointBackgroundColor: 'blue',
-//                 pointBorderColor: 'white',
-//                 tension: 0.3 // Smooth curve
-//             }]
-//         },      
-//     });
-// })
 
 
 baseCurrencySelectHTML.addEventListener("change", function(event) {
     console.log('Base currency changed', event.target.value)
     baseCurrency = event.target.value
+ 
+    subTitle.innerText = `Convert ${allCurrenciesData[baseCurrency].name}`
 })
 
 exchangeCurrencySelectHTML.addEventListener("change", function(event) {
     console.log('Exchange currency change', event.target.value )
     exchangeCurrency = event.target.value
+
+    // exchangeRateCanvas.remove()
+    // chartContent.innerHTML = "<canvas id='exchange-rate-history'> </canvas>"
+    // data = [];
+    // getCurrencyHistory()
+    
+    subTitle.innerText = `Convert ${allCurrenciesData[baseCurrency].name} to ${allCurrenciesData[exchangeCurrency].name}`
 })
+
+
 
 showHistoryBtn.addEventListener("click", function(){
     historyContentHTML.classList.remove("hidden")
-    showChartFunc()
-   
+
+    chartTitle.innerHTML = `History of ${allCurrenciesData[baseCurrency].name} to ${allCurrenciesData[exchangeCurrency].name}`
+    theChart
 })
 
 
@@ -216,6 +212,9 @@ fetchBtnHTML.addEventListener("click", function(){
 
     historyContentHTML.classList.add("hidden")
     showHistoryBtn.classList.remove("hidden")
+
+    generateDates()
+    getCurrencyHistory()
 })
 
 switchBtn.addEventListener("click", function(){
@@ -273,28 +272,63 @@ function switchCurrency() {
     exchangeCurrency = exchangeCurrencySelectHTML.value;
     
 }
-let history;
 
-async function getCurrencyHistory(date){
-    const result = await currencyAPI.getExchangeHistory(date, baseCurrency, exchangeCurrency)
-    console.log(result)
+
+// GENERATE CHART SECTION //
+function DateTimeStamp() {
+    let start = Date.parse(startDate.value)
+    let end = Date.parse(endDate.value)
+    return (end / 86400000) - (start / 86400000)
+}
+
+let history = [];
+let data = [];
+
+
+function generateDates() {
+    const date = new Date();
+    let year = date.getFullYear();
+    let month = date.getMonth() + 1;
+    let day = date.getDate();
+    let fullDate = `${year}-0${month}-${day}`;
+    
+    for(let i = 2; i > 0; i--) {
+        history.push(`${year}-0${month}-${day - i}`)
+    }
+    console.log(history)
+    console.log(fullDate)
+}
+
+async function getCurrencyHistory(){
+    for(let i = 1; i >= 0; i--){
+        date = history[i]
+        const result = await currencyAPI.getExchangeHistory(date, baseCurrency, exchangeCurrency)
+        let total = Object.values(Object.values(result)[0])[0]
+        data.unshift(total)
+    }
 
 }
 
 
 
-function showChartFunc() {
+// function showChart() {
     //history chart
-    const labels = ['02.12.2025','02.13.2025','02.14.2025','02.15.2025','02.16.2025','02.17.2025','02.18.2025',];
-    const dataValues = [getCurrencyHistory('2025-02-18')];
 
-     new Chart(exchangeRateCanvas, {
+class NewChart {
+    
+    constructor() {
+        this.labelsData = history,
+        this.dataValues= data;
+    
+    } 
+
+    chart = new Chart(exchangeRateCanvas, {
         type: 'line',
         data: {
-            labels: labels,  // X-axis labels (dates)
+            labels: this.labelsData,  // X-axis labels (dates)
             datasets: [{
                 label: 'Value',
-                data: dataValues,  // Y-axis values
+                data: this.dataValues,  // Y-axis values
                 borderColor: 'blue',
                 backgroundColor: 'rgba(0, 0, 255, 0.1)',
                 borderWidth: 2,
@@ -303,7 +337,10 @@ function showChartFunc() {
                 pointBorderColor: 'white',
                 tension: 0.3 // Smooth curve
             }]
-        },      
-    });
-}
+        },
 
+    })
+// }
+
+}
+const theChart = new NewChart()
