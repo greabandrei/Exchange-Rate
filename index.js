@@ -1,18 +1,15 @@
 // API
 
+function Currency(key, name, symbol) {
+    return {
+        key,
+        name,
+        symbol
+    }
+}
 class CurrencyAPI {
-
-    constructor(apiKey) {
-        this.baseURL = "https://api.freecurrencyapi.com/v1/"
-        this.apiKey = apiKey;
-    }
-
-    #getApiParam() {
-        return `apikey=${this.apiKey}`
-    }
-
     async getCurrencies() {
-        const URL = this.baseURL + "currencies?" + this.#getApiParam()
+        const URL = 'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies.json';
         const result = await fetch(URL);
 
         if(!result.ok) {
@@ -22,11 +19,12 @@ class CurrencyAPI {
         const json = await result.json();
 
         console.log(result, json);
-        return json.data;
+
+        return json;
     }
 
     async getExchangeRate(base, exchange) {
-        const URL = this.baseURL + "latest?" + this.#getApiParam() + "&base_currency=" + base + "&currencies=" + exchange
+        const URL = this.#urlBuilder('latest', base);
         const result = await fetch(URL);
 
         if(!result.ok) {
@@ -36,11 +34,18 @@ class CurrencyAPI {
         const json = await result.json();
 
         console.log(result,json);
-        return json.data
+
+        const exchangeRate = {}
+        exchangeRate[exchange] = json[base.toLowerCase()][exchange.toLowerCase()]
+        
+        console.log("rate: ", exchangeRate);
+
+        return exchangeRate;
     }
 
     async getExchangeHistory(date, base, exchange) {
-        const URL = this.baseURL + "historical?" + this.#getApiParam() + "&date=" + date + "&base_currency=" + base + "&currencies=" + exchange
+        console.log("INFO: getExchangeHistory ", date, base, exchange)
+        const URL = this.#urlBuilder(date, base);
         const result = await fetch(URL);
 
         if(!result.ok) {
@@ -50,211 +55,165 @@ class CurrencyAPI {
         const json = await result.json();
         console.log(result, json)
 
-        return json.data
+        const exchangeRate = {}
+        exchangeRate[json.date] = {};
+        exchangeRate[json.date][exchange] = json[base.toLowerCase()][exchange.toLowerCase()]
+        
+        console.log("rate: ", exchangeRate);
+
+        return exchangeRate;
+    }
+
+    #urlBuilder(date, baseCurrency) {
+        return `https://${date}.currency-api.pages.dev/v1/currencies/${baseCurrency.toLowerCase()}.json`;
     }
 }
 
-const currencyAPI = new CurrencyAPI("fca_live_5hi73jOEMH0Rl5vURCXZLxKZlUIzKlGSGwcrBp0C");
-
-
-//GLOBALS
-let currencies = {};
+//  =========== GLOBALS ==============
+let currencies = [];
+const currencyAPI = new CurrencyAPI();
+const currencyMap = {};
 let baseCurrency;               // store base currency symbol of currency in order to use it for URL
 let exchangeCurrency;           // store the exchange currency symbol in order to use it for URL
-let currencyRate;               // store the currency ratio by base currency (1 euro = /1.2 usd/)
-let result;                     // using Object.values(result) we get an array that contains the value of currency rate
 
-
-// HTML ELEMENTS
-const fetchBtnHTML = document.getElementById("fetchBtn");
-const allCurrencies = document.getElementById("all")
-const baseCurrencySelectHTML = document.getElementById("base-currency");
-const exchangeCurrencySelectHTML = document.getElementById("exchange-currency");
-const exchangeFrom = document.getElementById("from");
-const exchangeResult = document.getElementById("to");
-const amount = document.getElementById("amount");
-const switchBtn = document.getElementById("switch-btn")
-const rateForOne = document.getElementById("ex-from")
-const lastUpdate = document.getElementById("text")
-const exchangeRateCanvas = document.getElementById("exchange-rate-history")
-const showHistoryBtn = document.getElementById("show-history-btn")
-const historyContentHTML = document.getElementById("history-content")
-const startDate = document.getElementById("start-date-input")
-const endDate = document.getElementById("end-date-input")
-const chartTitle = document.getElementById("chart-title")
-const subTitle = document.getElementById("sub-title")
-const chartContent = document.getElementById("chart-content")
-const day7Btn = document.getElementById("day7-btn")
-const day3Btn = document.getElementById("day3-btn")
-const day1Btn = document.getElementById("day1-btn")
-
-// const DOM = {
-//     fetchBtn: document.getElementById("fetchBtn"),
-//     allCurrencies: document.getElementById("all"),
-//     baseCurrencySelect: document.getElementById("base-currency"),
-//     exchangeCurrencySelect: document.getElementById("exchange-currency"),
-//     exchangeFrom: document.getElementById("from"),
-//     exchangeResult: document.getElementById("to"),
-//     amount: document.getElementById("amount"),
-//     switchBtn: document.getElementById("switch-btn"),
-//     rateForOne: document.getElementById("ex-from"),
-//     lastUpdate: document.getElementById("text"),
-//     exchangeRateCanvas: document.getElementById("exchange-rate-history"),
-//     showHistoryBtn: document.getElementById("show-history-btn")
-// }
-
-// EVENT LISTENERS
-
-// allCurrencies.addEventListener("click", async function() {
-//     currencies = await currencyAPI.getCurrencies();
-//     console.log("data: ", currencies)
-
-//     const currencySelectOptions = Object.keys(currencies).map(
-//         c => `<option>${c}</option>`
-//     );
-//     currencySelectOptions.unshift(`<option></option>`)
-
-//     console.log(currencySelectOptions);
-
-//     baseCurrencySelectHTML.innerHTML = currencySelectOptions.join('');
-//     exchangeCurrencySelectHTML.innerHTML = currencySelectOptions.join('');    
-// })
-
-let allCurrenciesData;
-async function getAllCurrencies() {                      //here we have the live load of currencies list 
-    currencies = localStorage.getItem('currencies')
-   
-    if(!currencies){
-        currencies = await currencyAPI.getCurrencies();
-        localStorage.setItem('currencies', JSON.stringify(currencies))
-    }else{
-        currencies = JSON.parse(currencies)
-    }
-    
-    allCurrenciesData = currencies
-
-    const currencySelectOptions = Object.keys(currencies).map(
-        c => `<option>${c}</option>`
-    );
-    currencySelectOptions.unshift(`<option></option>`)
-    
-    baseCurrencySelectHTML.innerHTML = currencySelectOptions.join('');
-    exchangeCurrencySelectHTML.innerHTML = currencySelectOptions.join('');    
+//  ============== HTML ELEMENTS ==============
+const DOM = {
+    convertBtn: document.getElementById("convertBtn"),
+    allCurrencies: document.getElementById("all"),
+    baseCurrencySelect: document.getElementById("base-currency"),
+    exchangeCurrencySelect: document.getElementById("exchange-currency"),
+    exchangeFrom: document.getElementById("from"),
+    exchangeResult: document.getElementById("to"),
+    amount: document.getElementById("amount"),
+    switchBtn: document.getElementById("switch-btn"),
+    rateForOne: document.getElementById("ex-from"),
+    lastUpdate: document.getElementById("text"),
+    exchangeRateCanvas: document.getElementById("exchange-rate-history"),
+    showHistoryBtn: document.getElementById("show-history-btn"),
+    historyContent: document.getElementById("history-content"),
+    subTitle: document.getElementById("sub-title"),
+    startDate: document.getElementById("start-date-input"),
+    endDate: document.getElementById("end-date-input"),
+    chartTitle: document.getElementById("chart-title"),
+    subTitle: document.getElementById("sub-title"),
+    chartContent: document.getElementById("chart-content"),
+    day7Btn: document.getElementById("day7-btn"),
+    day3Btn: document.getElementById("day3-btn"),
+    day1Btn: document.getElementById("day1-btn"),
 }
 
+// ====== EVENT LISTENERS =======
+
+document.addEventListener("DOMContentLoaded", onDocumentLoaded);
+DOM.convertBtn.addEventListener("click", onConvertClick)
+DOM.baseCurrencySelect.addEventListener("change", onBaseCurrencyChange)
+DOM.exchangeCurrencySelect.addEventListener("change", onExchangeCurrencyChange)
+DOM.switchBtn.addEventListener("click", onSwitchClick)
+DOM.showHistoryBtn.addEventListener("click", onShowHistoryClick)
 
 
-document.addEventListener("DOMContentLoaded", function(){
+//  ======== EVENTS ============
+
+function onDocumentLoaded() {
     getAllCurrencies()
     lastRateUpdate()
-
-    subTitle.innerHTML = `Convert currencies`
-
-    // localStorage.setItem('test', new Date())
-})
-
-
-
-baseCurrencySelectHTML.addEventListener("change", function(event) {
-    console.log('Base currency changed', event.target.value)
-    baseCurrency = event.target.value
- 
-    subTitle.innerText = `Convert ${allCurrenciesData[baseCurrency].name}`
-    convert()
-})
-
-exchangeCurrencySelectHTML.addEventListener("change", function(event) {
-    console.log('Exchange currency change', event.target.value )
-    exchangeCurrency = event.target.value
-        
-    subTitle.innerText = `Convert ${allCurrenciesData[baseCurrency].name} to ${allCurrenciesData[exchangeCurrency].name}`
-    convert()
-
-    data = [];
-    getCurrencyHistoryDefault()
-
-    historyContentHTML.classList.add("hidden")
-    chart.destroy()
-
-
-})
-
-function click() {
-    document.getElementById("show-history-btn").click()
 }
 
-
-
-showHistoryBtn.addEventListener("click", function(){
-    historyContentHTML.classList.remove("hidden")
-
-    getChart(history, data)
-    chartTitle.innerHTML = `History of ${allCurrenciesData[baseCurrency].name} to ${allCurrenciesData[exchangeCurrency].name}`
-})
-
-
-
-async function convert(){
-    const exchange = await currencyAPI.getExchangeRate(baseCurrency, exchangeCurrency);
-    console.log('data:', exchange)
-    result = exchange
-    
-    exchangeFrom.innerText = `${Number(amount.value)} ${baseCurrency} =`;
-    exchangeResult.innerText = `${calculateExchangeCurrencyRate()} ${exchangeCurrency}`;
-    rateForOne.innerText =`1 ${baseCurrency} = ${exchangeCurrencyRateOne()} ${exchangeCurrency}`
-}
-
-fetchBtnHTML.addEventListener("click", function(){
-
+function onConvertClick(){
     if(Number(amount.value) <= 0){
         alert('Amount should be greater than 0')
         return
     }
-    if(baseCurrencySelectHTML.selectedIndex === 0){
+    if(DOM.baseCurrencySelect.selectedIndex === 0){
         alert('Select from wich currency to convert')
         return
     }
-    if(exchangeCurrencySelectHTML.selectedIndex === 0){
+    if(DOM.exchangeCurrencySelect.selectedIndex === 0){
         alert('alert to wich currency you want to exchange')
         return
     }
     
     convert()
-    
-
-    historyContentHTML.classList.add("hidden")
-    showHistoryBtn.classList.remove("hidden")
-
-    generateDatesDefault()
-    getCurrencyHistoryDefault()
-})
-
-switchBtn.addEventListener("click", function(){
-    switchCurrency()
-    convert()
-})
-
-
-
-//  ========Helper Functions===========   //
-
-function calculateExchangeCurrencyRate() {
-    let rate;
-    let theAmount = Number(amount.value)
-    
-    rate = Object.values(result)
-    currencyRate = rate[0]
-    
-    return currencyRate * theAmount
 }
 
-function exchangeCurrencyRateOne() {
-    let rate;
+function onBaseCurrencyChange(event) {
+    console.log('Base currency changed', event.target.value)
+    baseCurrency = event.target.value
+    updateConvertTitle();
+}
+
+function onExchangeCurrencyChange(event) {
+    console.log('Exchange currency change', event.target.value )
+    exchangeCurrency = event.target.value
+    updateConvertTitle();
+}
+
+function onSwitchClick(){
+    const temp = DOM.baseCurrencySelect.value;
+    DOM.baseCurrencySelect.value = DOM.exchangeCurrencySelect.value;
+    DOM.exchangeCurrencySelect.value = temp;
+
+    baseCurrency = DOM.baseCurrencySelect.value;
+    exchangeCurrency = DOM.exchangeCurrencySelect.value;
+
+    convert()
+}
+
+function onShowHistoryClick(){
+    DOM.historyContent.classList.remove("hidden")
+
+    getChart(history, data)
+    DOM.chartTitle.innerHTML = `History of ${currencyMap[baseCurrency].name} to ${currencyMap[exchangeCurrency].name}`
+}
+
+function onTest(text) {
+    alert("test -> " + text)
+}
+//  ========Helper Functions===========   //
+
+async function getAllCurrencies() {                      //here we have the live load of currencies list 
+    currencies = localStorage.getItem('currencies')
+   
+    if(!currencies){
+        result = await currencyAPI.getCurrencies();
+        currencies = Object.keys(result).map(c => Currency(c, result[c], c.toUpperCase()))
+        localStorage.setItem('currencies', JSON.stringify(currencies))
+    }else{
+        currencies = JSON.parse(currencies)
+    }
+
+    // Convert currency list to map for faster currency retrieval
+    currencies.forEach(element => {
+        currencyMap[element.key] = element;
+    });
+
+    const currencySelectOptions = currencies.map(
+        c => `<option value=${c.key}>${c.symbol}</option>`
+    );
+    currencySelectOptions.unshift(`<option></option>`)
     
-    rate = Object.values(result)
-    number = rate[0]
+    DOM.baseCurrencySelect.innerHTML = currencySelectOptions.join('');
+    DOM.exchangeCurrencySelect.innerHTML = currencySelectOptions.join('');    
+}
+
+function updateConvertTitle() {
+    let text = "Convert currencies";
+    if (baseCurrency && exchangeCurrency) {
+        text = `Convert from ${currencyMap[baseCurrency].name} to ${currencyMap[exchangeCurrency].name}`
+    }
+    DOM.subTitle.innerText = text;
+}
+
+async function convert(){
+    resetHTMLFields();
+
+    const exchange = await currencyAPI.getExchangeRate(baseCurrency, exchangeCurrency);
     
-    return number 
+    DOM.exchangeFrom.innerText = `${Number(amount.value)} ${currencyMap[baseCurrency].symbol} =`;
+    DOM.exchangeResult.innerText = `${exchange[exchangeCurrency] * Number(amount.value)} ${currencyMap[exchangeCurrency].symbol}`;
+    DOM.rateForOne.innerText =`1 ${baseCurrency} = ${exchange[exchangeCurrency]} ${currencyMap[exchangeCurrency].symbol}`
+    DOM.historyContent.classList.add("hidden")
+    DOM.showHistoryBtn.classList.remove("hidden")
 }
 
 function lastRateUpdate(){
@@ -267,33 +226,19 @@ function lastRateUpdate(){
     
     let fullDate = `Last exchange rate update ${month} ${day} ${year}`
     
-    return lastUpdate.innerHTML = fullDate;
+    return DOM.lastUpdate.innerHTML = fullDate;
 }
 
-function switchCurrency() {
-    let selected1 = document.getElementById("base-currency");
-    let selected2 = document.getElementById("exchange-currency");
-    
-    let baseIdx = selected1.selectedIndex;
-    let exchangeIdx = selected2.selectedIndex;
-    
-    selected1.selectedIndex = exchangeIdx;
-    selected2.selectedIndex = baseIdx;
-
-    baseCurrency = baseCurrencySelectHTML.value;
-    exchangeCurrency = exchangeCurrencySelectHTML.value;
-    
+function resetHTMLFields() {
+    DOM.historyContent.classList.add("hidden")
+    DOM.showHistoryBtn.classList.add("hidden")
+    DOM.exchangeFrom.innerText = ''
+    DOM.exchangeResult.innerText = ''
+    DOM.rateForOne.innerText = '';
 }
-
-
-
 
 // GENERATE CHART SECTION //
-function DateTimeStamp() {
-    let start = Date.parse(startDate.value)
-    let end = Date.parse(endDate.value)
-    return (end / 86400000) - (start / 86400000)
-}
+
 
 let history = [];
 let data = [];
@@ -335,7 +280,7 @@ function generate7DayResult() {
     getChart(newHistory, newDate);
 }
 
-day7Btn.addEventListener("focusin", generate7DayResult)
+DOM.day7Btn.addEventListener("focusin", generate7DayResult)
 
 
 
@@ -354,7 +299,7 @@ function generate3DayResult() {
   
 }
 
-day3Btn.addEventListener("focusin", generate3DayResult)
+DOM.day3Btn.addEventListener("focusin", generate3DayResult)
 
 function generate1DayResult() {
     let newDate = [data[6]];
@@ -370,19 +315,19 @@ function generate1DayResult() {
    
 }
 
-day1Btn.addEventListener("focusin", generate1DayResult)
+DOM.day1Btn.addEventListener("focusin", generate1DayResult)
+
 
 
 
 let chart;
-
 function getChart(history, data) {
 
 
     const labelsData = history;
     const dataValues = data;
     
-    const theChart = new Chart(exchangeRateCanvas, {
+    const theChart = new Chart(DOM.exchangeRateCanvas, {
         type: 'line',
         data: {
             labels: labelsData,  // X-axis labels (dates)

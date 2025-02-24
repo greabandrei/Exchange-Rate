@@ -70,6 +70,14 @@ body {
             font-weight: bolder;
             padding: 15px 60px;
         }
+
+        .convert-btn {
+            cursor: pointer;
+        }
+
+        .amount-input {
+            cursor: text !important;
+        }
         
 
     .middle-content {

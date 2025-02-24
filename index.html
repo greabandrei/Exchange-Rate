@@ -15,13 +15,13 @@
     <div class="content-wrapper">
         
         <div class="content-box">
-            <h1 class="sub-title" id="sub-title"></h1>
+            <h1 class="sub-title" id="sub-title">Convert currencies</h1>
             
             
             <div class="middle-content">
                 
                 <div class="input-wrapper">
-                    <input id="amount" class="insert" type="number">
+                    <input id="amount" class="insert amount-input" type="number">
                     <label class="input-wrapper-label">Amount</label>  
                 </div>
                 
@@ -46,7 +46,7 @@
             <div class="top-content">
         
                 <div class="button-box">
-                    <button class="btn-style" id="fetchBtn">Convert</button>
+                    <button class="btn-style convert-btn" id="convertBtn">Convert</button>
                 </div>    
             </div>
             
@@ -99,9 +99,9 @@
             </div>
             <div class="chart-btn">
 
-                <button id="day1-btn">1d</button>
-                <button id="day3-btn">3d</button>
-                <button id="day7-btn">7d</button>
+                <button id="day1-btn" onclick="onTest('abc')">7d</button>
+                <button id="day3-btn">1m</button>
+                <button id="day7-btn">3m</button>
             
             </div>
             
