@@ -160,6 +160,7 @@ baseCurrencySelectHTML.addEventListener("change", function(event) {
     baseCurrency = event.target.value
  
     subTitle.innerText = `Convert ${allCurrenciesData[baseCurrency].name}`
+    convert()
 })
 
 exchangeCurrencySelectHTML.addEventListener("change", function(event) {
@@ -167,7 +168,20 @@ exchangeCurrencySelectHTML.addEventListener("change", function(event) {
     exchangeCurrency = event.target.value
         
     subTitle.innerText = `Convert ${allCurrenciesData[baseCurrency].name} to ${allCurrenciesData[exchangeCurrency].name}`
+    convert()
+
+    data = [];
+    getCurrencyHistoryDefault()
+
+    historyContentHTML.classList.add("hidden")
+    chart.destroy()
+
+
 })
+
+function click() {
+    document.getElementById("show-history-btn").click()
+}
 
 
 
@@ -211,7 +225,7 @@ fetchBtnHTML.addEventListener("click", function(){
     historyContentHTML.classList.add("hidden")
     showHistoryBtn.classList.remove("hidden")
 
-    generateDates()
+    generateDatesDefault()
     getCurrencyHistoryDefault()
 })
 
@@ -272,6 +286,8 @@ function switchCurrency() {
 }
 
 
+
+
 // GENERATE CHART SECTION //
 function DateTimeStamp() {
     let start = Date.parse(startDate.value)
@@ -283,7 +299,7 @@ let history = [];
 let data = [];
 
 
-function generateDates() {
+function generateDatesDefault() {
     const date = new Date();
     let year = date.getFullYear();
     let month = date.getMonth() + 1;
