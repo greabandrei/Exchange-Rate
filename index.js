@@ -270,22 +270,28 @@ function generateDatesDefault() {
     let day = date.getDate();
     let fullDate = `${year}-0${month}-${day}`;
     
-    for(let i = 7; i > 0; i--) {
-        days.push(`${year}-0${month}-${day - i}`)
+    for(let i = 30; i > 0; i--) {
+        if(day > 1){
+        days.push(`${year}-0${month}-${day-= 1}`) 
+        }
+        else{
+            days.push(`${year}-0${month - 1}-${day}`);
+            day = 30;
+        }
     }
     // console.log(history)
     // console.log(fullDate)
 }
 
-async function getCurrencyHistoryDefault(){
-    for(let i = 6; i >= 0; i--){
-        date = days[i]
-        const result = await currencyAPI.getExchangeHistory(date, baseCurrency, exchangeCurrency)
-        let total = Object.values(Object.values(result)[0])[0]
-        data.unshift(total)
-    }
+// async function getCurrencyHistoryDefault(){
+//     for(let i = 6; i >= 0; i--){
+//         date = days[i]
+//         const result = await currencyAPI.getExchangeHistory(date, baseCurrency, exchangeCurrency)
+//         let total = Object.values(Object.values(result)[0])[0]
+//         data.unshift(total)
+//     }
 
-}
+// }
 
 function generate7DayResult() {
     let newDate = data;
@@ -298,9 +304,6 @@ function generate7DayResult() {
     // click()
     getChart(newHistory, newDate);
 }
-
-
-
 
 
 
