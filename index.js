@@ -63,7 +63,7 @@ class CurrencyAPI {
 
         return exchangeRate;
     }
-
+    
     #urlBuilder(date, baseCurrency) {
         return `https://${date}.currency-api.pages.dev/v1/currencies/${baseCurrency.toLowerCase()}.json`;
     }
@@ -75,6 +75,8 @@ const currencyAPI = new CurrencyAPI();
 const currencyMap = {};
 let baseCurrency;               // store base currency symbol of currency in order to use it for URL
 let exchangeCurrency;           // store the exchange currency symbol in order to use it for URL
+let days = [];
+let data = [];
 
 //  ============== HTML ELEMENTS ==============
 const DOM = {
@@ -97,9 +99,9 @@ const DOM = {
     chartTitle: document.getElementById("chart-title"),
     subTitle: document.getElementById("sub-title"),
     chartContent: document.getElementById("chart-content"),
+    month3Btn: document.getElementById("month3-btn"),
+    month1Btn: document.getElementById("month1-btn"),
     day7Btn: document.getElementById("day7-btn"),
-    day3Btn: document.getElementById("day3-btn"),
-    day1Btn: document.getElementById("day1-btn"),
 }
 
 // ====== EVENT LISTENERS =======
@@ -110,6 +112,9 @@ DOM.baseCurrencySelect.addEventListener("change", onBaseCurrencyChange)
 DOM.exchangeCurrencySelect.addEventListener("change", onExchangeCurrencyChange)
 DOM.switchBtn.addEventListener("click", onSwitchClick)
 DOM.showHistoryBtn.addEventListener("click", onShowHistoryClick)
+DOM.month3Btn.addEventListener("focusin", generate3MResult)
+DOM.month1Btn.addEventListener("focusin", generate1MResult)
+DOM.day7Btn.addEventListener("focusin", generate7DayResult)
 
 
 //  ======== EVENTS ============
@@ -159,19 +164,22 @@ function onSwitchClick(){
     convert()
 }
 
-function onShowHistoryClick(){
+async function onShowHistoryClick(){
     DOM.historyContent.classList.remove("hidden")
+    generateDatesDefault()
+    await getCurrencyHistoryDefault()
+    
 
-    getChart(history, data)
+    getChart(days, data)
     DOM.chartTitle.innerHTML = `History of ${currencyMap[baseCurrency].name} to ${currencyMap[exchangeCurrency].name}`
 }
 
-function onTest(text) {
-    alert("test -> " + text)
-}
+// function onTest(text) {
+//     alert("test -> " + text)
+// }
 //  ========Helper Functions===========   //
 
-async function getAllCurrencies() {                      //here we have the live load of currencies list 
+async function getAllCurrencies() {                     
     currencies = localStorage.getItem('currencies')
    
     if(!currencies){
@@ -239,9 +247,20 @@ function resetHTMLFields() {
 
 // GENERATE CHART SECTION //
 
+let ran = [];
+function generateDates(startDate, endDate) {
+    let start = new Date(startDate);
+    let end = new Date (endDate);
 
-let history = [];
-let data = [];
+    let range = [];
+    while(start <= end) {
+        range.push(new Date(start));
+        start.setDate(start.getDate() + 1)
+    };
+
+    ran = range;
+}
+
 
 
 function generateDatesDefault() {
@@ -252,7 +271,7 @@ function generateDatesDefault() {
     let fullDate = `${year}-0${month}-${day}`;
     
     for(let i = 7; i > 0; i--) {
-        history.push(`${year}-0${month}-${day - i}`)
+        days.push(`${year}-0${month}-${day - i}`)
     }
     // console.log(history)
     // console.log(fullDate)
@@ -260,7 +279,7 @@ function generateDatesDefault() {
 
 async function getCurrencyHistoryDefault(){
     for(let i = 6; i >= 0; i--){
-        date = history[i]
+        date = days[i]
         const result = await currencyAPI.getExchangeHistory(date, baseCurrency, exchangeCurrency)
         let total = Object.values(Object.values(result)[0])[0]
         data.unshift(total)
@@ -280,17 +299,15 @@ function generate7DayResult() {
     getChart(newHistory, newDate);
 }
 
-DOM.day7Btn.addEventListener("focusin", generate7DayResult)
 
 
 
 
-function generate3DayResult() {
+
+function generate1MResult() {
     let newDate = [data[4], data[5], data[6]];
     let newHistory = [history[4], history[5], history[6]]
     
-    // history = newHistory;
-    // data = newDate;
 
     chart.destroy();
     // click()
@@ -299,9 +316,9 @@ function generate3DayResult() {
   
 }
 
-DOM.day3Btn.addEventListener("focusin", generate3DayResult)
 
-function generate1DayResult() {
+
+function generate3MResult() {
     let newDate = [data[6]];
     let newHistory = [history[6]]
     
@@ -315,16 +332,14 @@ function generate1DayResult() {
    
 }
 
-DOM.day1Btn.addEventListener("focusin", generate1DayResult)
+
 
 
 
 
 let chart;
-function getChart(history, data) {
-
-
-    const labelsData = history;
+function getChart(days, data) {
+    const labelsData = days;
     const dataValues = data;
     
     const theChart = new Chart(DOM.exchangeRateCanvas, {
