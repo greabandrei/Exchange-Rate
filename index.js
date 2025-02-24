@@ -84,6 +84,9 @@ const endDate = document.getElementById("end-date-input")
 const chartTitle = document.getElementById("chart-title")
 const subTitle = document.getElementById("sub-title")
 const chartContent = document.getElementById("chart-content")
+const day7Btn = document.getElementById("day7-btn")
+const day3Btn = document.getElementById("day3-btn")
+const day1Btn = document.getElementById("day1-btn")
 
 // const DOM = {
 //     fetchBtn: document.getElementById("fetchBtn"),
@@ -162,12 +165,7 @@ baseCurrencySelectHTML.addEventListener("change", function(event) {
 exchangeCurrencySelectHTML.addEventListener("change", function(event) {
     console.log('Exchange currency change', event.target.value )
     exchangeCurrency = event.target.value
-
-    // exchangeRateCanvas.remove()
-    // chartContent.innerHTML = "<canvas id='exchange-rate-history'> </canvas>"
-    // data = [];
-    // getCurrencyHistory()
-    
+        
     subTitle.innerText = `Convert ${allCurrenciesData[baseCurrency].name} to ${allCurrenciesData[exchangeCurrency].name}`
 })
 
@@ -176,8 +174,8 @@ exchangeCurrencySelectHTML.addEventListener("change", function(event) {
 showHistoryBtn.addEventListener("click", function(){
     historyContentHTML.classList.remove("hidden")
 
+    getChart(history, data)
     chartTitle.innerHTML = `History of ${allCurrenciesData[baseCurrency].name} to ${allCurrenciesData[exchangeCurrency].name}`
-    theChart
 })
 
 
@@ -214,7 +212,7 @@ fetchBtnHTML.addEventListener("click", function(){
     showHistoryBtn.classList.remove("hidden")
 
     generateDates()
-    getCurrencyHistory()
+    getCurrencyHistoryDefault()
 })
 
 switchBtn.addEventListener("click", function(){
@@ -292,15 +290,15 @@ function generateDates() {
     let day = date.getDate();
     let fullDate = `${year}-0${month}-${day}`;
     
-    for(let i = 2; i > 0; i--) {
+    for(let i = 7; i > 0; i--) {
         history.push(`${year}-0${month}-${day - i}`)
     }
-    console.log(history)
-    console.log(fullDate)
+    // console.log(history)
+    // console.log(fullDate)
 }
 
-async function getCurrencyHistory(){
-    for(let i = 1; i >= 0; i--){
+async function getCurrencyHistoryDefault(){
+    for(let i = 6; i >= 0; i--){
         date = history[i]
         const result = await currencyAPI.getExchangeHistory(date, baseCurrency, exchangeCurrency)
         let total = Object.values(Object.values(result)[0])[0]
@@ -309,26 +307,72 @@ async function getCurrencyHistory(){
 
 }
 
-
-
-// function showChart() {
-    //history chart
-
-class NewChart {
+function generate7DayResult() {
+    let newDate = data;
+    let newHistory = history;
     
-    constructor() {
-        this.labelsData = history,
-        this.dataValues= data;
-    
-    } 
+    // history = newHistory;
+    // data = newDate;
 
-    chart = new Chart(exchangeRateCanvas, {
+    chart.destroy();
+    // click()
+    getChart(newHistory, newDate);
+}
+
+day7Btn.addEventListener("focusin", generate7DayResult)
+
+
+
+
+function generate3DayResult() {
+    let newDate = [data[4], data[5], data[6]];
+    let newHistory = [history[4], history[5], history[6]]
+    
+    // history = newHistory;
+    // data = newDate;
+
+    chart.destroy();
+    // click()
+    getChart(newHistory, newDate);
+
+  
+}
+
+day3Btn.addEventListener("focusin", generate3DayResult)
+
+function generate1DayResult() {
+    let newDate = [data[6]];
+    let newHistory = [history[6]]
+    
+    // history = newHistory;
+    // data = newDate;
+
+    chart.destroy();
+    // click()
+    getChart(newHistory, newDate);
+
+   
+}
+
+day1Btn.addEventListener("focusin", generate1DayResult)
+
+
+
+let chart;
+
+function getChart(history, data) {
+
+
+    const labelsData = history;
+    const dataValues = data;
+    
+    const theChart = new Chart(exchangeRateCanvas, {
         type: 'line',
         data: {
-            labels: this.labelsData,  // X-axis labels (dates)
+            labels: labelsData,  // X-axis labels (dates)
             datasets: [{
                 label: 'Value',
-                data: this.dataValues,  // Y-axis values
+                data: dataValues,  // Y-axis values
                 borderColor: 'blue',
                 backgroundColor: 'rgba(0, 0, 255, 0.1)',
                 borderWidth: 2,
@@ -340,7 +384,5 @@ class NewChart {
         },
 
     })
-// }
-
+    chart = theChart
 }
-const theChart = new NewChart()
