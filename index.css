@@ -248,7 +248,7 @@ body {
     flex-direction: column;
 }
 
-    .chart-btn {
+    .chart-btn-wrapper {
         display: flex;
         width: 100%;
         justify-content: center;
@@ -256,18 +256,11 @@ body {
         gap: 10px;
         padding:4px;
     }
-        .chart-btn button {
-            background-color: rgb(71, 82, 104);
-            color: white;
-            border-radius: 5px;
-            border: none;
-            font-size: 20px;
-            width: 80px;
-            height: 40px;
-        }
 
-        .chart-btn button:focus {
-            background-color: rgb(207, 207, 207);
+        .chart-btn{
+            font-size: 14px;
+            padding: 12px 20px;
+            cursor: pointer;
         }
     
 

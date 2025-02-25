@@ -83,25 +83,12 @@
     <div id="history-content"  class="content-wrapper hidden">
         <div class="content-box"> 
             <h1 class="sub-title" id="chart-title"></h1>
-            
-            <div class="range-data">
-                
-                <div class="input-label">
-                    <label class="date-label">Start date</label>
-                    <input id="start-date-input" class="insert-date" type="date">
-                </div>
-                
-                <div class="input-label">
-                    <label class="date-label">End date</label>
-                    <input id="end-date-input" class="insert-date" type="date">
-                </div>
+        
+            <div class="chart-btn-wrapper">
 
-            </div>
-            <div class="chart-btn">
-
-                <button id="day7-btn" onclick="onTest('abc')">7d</button>
-                <button id="month1-btn">1m</button>
-                <button id="month3-btn">3m</button>
+                <button class="btn-style chart-btn" onclick="onHistoryDaysClick(6)">7 Days</button>
+                <button class="btn-style chart-btn" onclick="onHistoryDaysClick(30)">1 Months</button>
+                <button class="btn-style chart-btn" onclick="onHistoryDaysClick(90)">3 Months</button>
             
             </div>
             

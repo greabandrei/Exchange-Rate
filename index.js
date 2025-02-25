@@ -56,12 +56,32 @@ class CurrencyAPI {
         console.log(result, json)
 
         const exchangeRate = {}
-        exchangeRate[json.date] = {};
-        exchangeRate[json.date][exchange] = json[base.toLowerCase()][exchange.toLowerCase()]
+        exchangeRate[json.date] = json[base.toLowerCase()][exchange.toLowerCase()]
         
         console.log("rate: ", exchangeRate);
 
         return exchangeRate;
+    }
+
+    async getExchangeHistoryRange(startDate, endDate, base, exchange) {
+        console.log('getExchangeHistoryRange', startDate, endDate, base, exchange);
+        currencyHistory = {};
+        let fetchDates = []
+        let currentDay = new Date(startDate);
+        while (currentDay.getTime() < endDate.getTime()) {
+            fetchDates.push(currentDay.toISOString().split('T')[0])
+            currentDay = new Date(currentDay.getTime() + DAY_IN_MS + 3600);
+        }
+        console.log('getExchangeHistoryRange', fetchDates);
+        const parallelCalls = fetchDates.map(date => this.getExchangeHistory(date, base, exchange));
+        console.log('parallelCalls', parallelCalls)
+        const result = await Promise.all(parallelCalls);
+
+        const resultMap = {}
+        result.forEach(r => Object.assign(resultMap, r));
+
+        console.log('getExchangeHistoryRange', resultMap);
+        return resultMap;
     }
     
     #urlBuilder(date, baseCurrency) {
@@ -70,13 +90,19 @@ class CurrencyAPI {
 }
 
 //  =========== GLOBALS ==============
+const DAY_IN_MS = 24 * 3600 * 1000;
 let currencies = [];
 const currencyAPI = new CurrencyAPI();
 const currencyMap = {};
 let baseCurrency;               // store base currency symbol of currency in order to use it for URL
 let exchangeCurrency;           // store the exchange currency symbol in order to use it for URL
+let startHistoryDate;
+let historyNrOfDays = 90;
+let currencyHistory = {};
+
 let days = [];
-let data = [];
+let dataSet = [];
+let chart;
 
 //  ============== HTML ELEMENTS ==============
 const DOM = {
@@ -99,9 +125,6 @@ const DOM = {
     chartTitle: document.getElementById("chart-title"),
     subTitle: document.getElementById("sub-title"),
     chartContent: document.getElementById("chart-content"),
-    month3Btn: document.getElementById("month3-btn"),
-    month1Btn: document.getElementById("month1-btn"),
-    day7Btn: document.getElementById("day7-btn"),
 }
 
 // ====== EVENT LISTENERS =======
@@ -112,9 +135,6 @@ DOM.baseCurrencySelect.addEventListener("change", onBaseCurrencyChange)
 DOM.exchangeCurrencySelect.addEventListener("change", onExchangeCurrencyChange)
 DOM.switchBtn.addEventListener("click", onSwitchClick)
 DOM.showHistoryBtn.addEventListener("click", onShowHistoryClick)
-DOM.month3Btn.addEventListener("focusin", generate3MResult)
-DOM.month1Btn.addEventListener("focusin", generate1MResult)
-DOM.day7Btn.addEventListener("focusin", generate7DayResult)
 
 
 //  ======== EVENTS ============
@@ -122,6 +142,7 @@ DOM.day7Btn.addEventListener("focusin", generate7DayResult)
 function onDocumentLoaded() {
     getAllCurrencies()
     lastRateUpdate()
+    calculateStartHistoryDate()
 }
 
 function onConvertClick(){
@@ -166,12 +187,16 @@ function onSwitchClick(){
 
 async function onShowHistoryClick(){
     DOM.historyContent.classList.remove("hidden")
-    generateDatesDefault()
-    await getCurrencyHistoryDefault()
-    
-
-    getChart(days, data)
     DOM.chartTitle.innerHTML = `History of ${currencyMap[baseCurrency].name} to ${currencyMap[exchangeCurrency].name}`
+    
+    await fetchCurrencyHistory(currencyMap[baseCurrency].key, currencyMap[exchangeCurrency].key);
+    displayChart();
+}
+
+function onHistoryDaysClick(nrOfDays) {
+    historyNrOfDays = nrOfDays;
+    calculateStartHistoryDate();
+    resetChart();
 }
 
 // function onTest(text) {
@@ -217,6 +242,7 @@ async function convert(){
 
     const exchange = await currencyAPI.getExchangeRate(baseCurrency, exchangeCurrency);
     
+    chart?.destroy();
     DOM.exchangeFrom.innerText = `${Number(amount.value)} ${currencyMap[baseCurrency].symbol} =`;
     DOM.exchangeResult.innerText = `${exchange[exchangeCurrency] * Number(amount.value)} ${currencyMap[exchangeCurrency].symbol}`;
     DOM.rateForOne.innerText =`1 ${baseCurrency} = ${exchange[exchangeCurrency]} ${currencyMap[exchangeCurrency].symbol}`
@@ -245,113 +271,41 @@ function resetHTMLFields() {
     DOM.rateForOne.innerText = '';
 }
 
-// GENERATE CHART SECTION //
-
-let ran = [];
-function generateDates(startDate, endDate) {
-    let start = new Date(startDate);
-    let end = new Date (endDate);
-
-    let range = [];
-    while(start <= end) {
-        range.push(new Date(start));
-        start.setDate(start.getDate() + 1)
-    };
-
-    ran = range;
+function calculateStartHistoryDate() {
+    const today = new Date();
+    const lastDay = new Date(today.getTime() - DAY_IN_MS);
+    startHistoryDate = new Date(lastDay - (historyNrOfDays * DAY_IN_MS))
 }
 
-
-
-function generateDatesDefault() {
-    const date = new Date();
-    let year = date.getFullYear();
-    let month = date.getMonth() + 1;
-    let day = date.getDate();
-    let fullDate = `${year}-0${month}-${day}`;
-    
-    for(let i = 30; i > 0; i--) {
-        if(day > 1){
-        days.push(`${year}-0${month}-${day-= 1}`) 
-        }
-        else{
-            days.push(`${year}-0${month - 1}-${day}`);
-            day = 30;
-        }
-    }
-    // console.log(history)
-    // console.log(fullDate)
+async function fetchCurrencyHistory(base, exchange) {
+    console.log('fetchCurrencyHistory', base, exchange)
+    currencyHistory = await currencyAPI.getExchangeHistoryRange(startHistoryDate, new Date(), base, exchange)
+    console.log('fetchCurrencyHistory', currencyHistory)
 }
 
-// async function getCurrencyHistoryDefault(){
-//     for(let i = 6; i >= 0; i--){
-//         date = days[i]
-//         const result = await currencyAPI.getExchangeHistory(date, baseCurrency, exchangeCurrency)
-//         let total = Object.values(Object.values(result)[0])[0]
-//         data.unshift(total)
-//     }
+function getChartData() {
+    const historyStartDate = startHistoryDate.toISOString().split('T')[0];
+    const labels = Object.keys(currencyHistory).filter(cDate => cDate >= historyStartDate);
+    let data = [];
+    labels.forEach(date => {
+        data.push(currencyHistory[date]);
+    });
 
-// }
+    console.log('getChartData', historyStartDate, labels, data)
 
-function generate7DayResult() {
-    let newDate = data;
-    let newHistory = history;
-    
-    // history = newHistory;
-    // data = newDate;
-
-    chart.destroy();
-    // click()
-    getChart(newHistory, newDate);
+    return [labels, data];
 }
 
+function displayChart() {
+    const [labels, data] = getChartData();
 
-
-function generate1MResult() {
-    let newDate = [data[4], data[5], data[6]];
-    let newHistory = [history[4], history[5], history[6]]
-    
-
-    chart.destroy();
-    // click()
-    getChart(newHistory, newDate);
-
-  
-}
-
-
-
-function generate3MResult() {
-    let newDate = [data[6]];
-    let newHistory = [history[6]]
-    
-    // history = newHistory;
-    // data = newDate;
-
-    chart.destroy();
-    // click()
-    getChart(newHistory, newDate);
-
-   
-}
-
-
-
-
-
-
-let chart;
-function getChart(days, data) {
-    const labelsData = days;
-    const dataValues = data;
-    
-    const theChart = new Chart(DOM.exchangeRateCanvas, {
+    chart = new Chart(DOM.exchangeRateCanvas, {
         type: 'line',
         data: {
-            labels: labelsData,  // X-axis labels (dates)
+            labels,  // X-axis labels (dates)
             datasets: [{
                 label: 'Value',
-                data: dataValues,  // Y-axis values
+                data,  // Y-axis values
                 borderColor: 'blue',
                 backgroundColor: 'rgba(0, 0, 255, 0.1)',
                 borderWidth: 2,
@@ -361,7 +315,14 @@ function getChart(days, data) {
                 tension: 0.3 // Smooth curve
             }]
         },
-
     })
-    chart = theChart
 }
+
+function resetChart() {
+    const [labels, data] = getChartData();
+    chart.data.labels = labels;
+    chart.data.datasets.data = data;
+    chart.update();
+}
+
+
