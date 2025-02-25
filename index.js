@@ -125,6 +125,10 @@ const DOM = {
     chartTitle: document.getElementById("chart-title"),
     subTitle: document.getElementById("sub-title"),
     chartContent: document.getElementById("chart-content"),
+    footContent: document.getElementById("foot-content"),
+    convertLoader: document.getElementById("convert-loader"),
+    footContent: document.getElementById("foot-content"),
+    historyLoader: document.getElementById("history-loader")
 }
 
 // ====== EVENT LISTENERS =======
@@ -145,7 +149,10 @@ function onDocumentLoaded() {
     calculateStartHistoryDate()
 }
 
-function onConvertClick(){
+async function onConvertClick(){
+    DOM.footContent.classList.add("hidden")
+    DOM.convertLoader.classList.remove("hidden")
+    
     if(Number(amount.value) <= 0){
         alert('Amount should be greater than 0')
         return
@@ -158,9 +165,24 @@ function onConvertClick(){
         alert('alert to wich currency you want to exchange')
         return
     }
+
+    DOM.convertBtn.disabled = true; 
+    DOM.amount.disabled = true;
+    DOM.baseCurrencySelect.disabled = true;
+    DOM.switchBtn.disabled = true;
+    DOM.exchangeCurrencySelect.disabled = true;   
     
-    convert()
+    await convert()
+    
+    DOM.footContent.classList.remove("hidden")
+    DOM.convertLoader.classList.add("hidden")
+    DOM.convertBtn.disabled = false;
+    DOM.amount.disabled = false;
+    DOM.baseCurrencySelect.disabled = false;
+    DOM.switchBtn.disabled = false;
+    DOM.exchangeCurrencySelect.disabled = false; 
 }
+
 
 function onBaseCurrencyChange(event) {
     console.log('Base currency changed', event.target.value)
@@ -189,7 +211,12 @@ async function onShowHistoryClick(){
     DOM.historyContent.classList.remove("hidden")
     DOM.chartTitle.innerHTML = `History of ${currencyMap[baseCurrency].name} to ${currencyMap[exchangeCurrency].name}`
     
+    DOM.exchangeRateCanvas.classList.add("hidden")
+    DOM.historyLoader.classList.remove("hidden")
+
     await fetchCurrencyHistory(currencyMap[baseCurrency].key, currencyMap[exchangeCurrency].key);
+
+    DOM.historyLoader.classList.add("hidden")
     displayChart();
 }
 
@@ -265,7 +292,7 @@ function lastRateUpdate(){
 
 function resetHTMLFields() {
     DOM.historyContent.classList.add("hidden")
-    DOM.showHistoryBtn.classList.add("hidden")
+    DOM.showHistoryBtn.classList.remove("hidden")
     DOM.exchangeFrom.innerText = ''
     DOM.exchangeResult.innerText = ''
     DOM.rateForOne.innerText = '';

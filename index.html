@@ -46,11 +46,12 @@
             <div class="top-content">
         
                 <div class="button-box">
-                    <button class="btn-style convert-btn" id="convertBtn">Convert</button>
+                    <button class="btn-style convert-btn"  id="convertBtn">Convert</button>
                 </div>    
             </div>
             
-            <div class="foot-content">
+            <div class="loader hidden" id="convert-loader">Loading...</div>
+            <div class="foot-content" id="foot-content">
                 
                 <div class="foot-currencies">
                     <div>
@@ -93,6 +94,7 @@
             </div>
             
             <div class="chart-content" id="chart-content" >
+                <div class="history-loader hidden" id="history-loader">History is loading</div>
                 <canvas id="exchange-rate-history"></canvas>
             </div>
 
